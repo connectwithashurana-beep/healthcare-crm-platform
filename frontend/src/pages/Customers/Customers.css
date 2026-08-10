@@ -48,6 +48,9 @@ tr:hover {
   margin-right: 8px;
   border-radius: 5px;
   cursor: pointer;
+  margin-bottom: 5px;
+  width: 60px;
+
 }
 
 .edit-btn:hover {
@@ -62,6 +65,8 @@ tr:hover {
   margin-right: 8px;
   border-radius: 5px;
   cursor: pointer;
+  margin-bottom: 5px;
+  width: 60px;
 }
 
 .view-btn:hover {
@@ -91,6 +96,8 @@ tr:hover {
   padding: 10px 18px;
   border-radius: 6px;
   cursor: pointer;
+  margin-left: 50px;
+
 }
 
 .export-btn:hover {
@@ -101,8 +108,8 @@ tr:hover {
   gap: 10px;
 }
 
-.export-btn {
-  background: #16a34a;
+.add-btn{height: 40px;
+  background: red;
   color: white;
   border: none;
   padding: 10px 18px;
@@ -146,4 +153,6 @@ tr:hover {
   padding: 10px 18px;
   border-radius: 6px;
   cursor: pointer;
+  margin-left: 50px;
+
 }
