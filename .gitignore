@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual Environment
+venv/
+.venv/
+.venv-1/
+
+# Environment Variables
+.env
+*.env
+!.env.example
+
+# Django
+db.sqlite3
+media/
+staticfiles/
+
+# VS Code
+.vscode/
+
+# PyCharm
+.idea/
+
+# Node
+node_modules/
+
+# OS Files
+.DS_Store
+Thumbs.db
+

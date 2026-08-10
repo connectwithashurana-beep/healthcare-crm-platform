@@ -1,0 +1,30 @@
+.interaction-form {
+  width: 600px;
+  background: white;
+  padding: 25px;
+  border-radius: 10px;
+}
+
+.interaction-form input,
+.interaction-form select,
+.interaction-form textarea {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.interaction-form button {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.interaction-form button:hover {
+  background: #1d4ed8;
+}
