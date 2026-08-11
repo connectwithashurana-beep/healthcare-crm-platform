@@ -31,7 +31,7 @@ load_dotenv(BASE_DIR / ".env")
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 
 ALLOWED_HOSTS = [
     "healthcare-crm-platform.onrender.com",
@@ -91,15 +91,22 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
-        "NAME": "prof_crm",
-        "USER": "root",
-        "PASSWORD": "ashu",
-        "HOST": "localhost",
-        "PORT": "3306",
+        "NAME": os.getenv("DB_NAME", "defaultdb"),
+        "USER": os.getenv("DB_USER", "avnadmin"),
+        "PASSWORD": os.getenv("DB_PASSWORD"),
+        "HOST": os.getenv(
+            "DB_HOST",
+            "mysql-37630aba-connectwithashurana-6069.g.aivencloud.com"
+        ),
+        "PORT": os.getenv("DB_PORT", "17559"),
+        "OPTIONS": {
+            "ssl": {
+                "check_hostname": False,
+            },
+        },
     }
 }
 # Password validation
@@ -147,3 +154,4 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Development CORS - allow frontend dev server to call the API
 CORS_ALLOW_ALL_ORIGINS = True
+
