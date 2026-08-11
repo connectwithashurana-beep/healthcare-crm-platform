@@ -1,48 +1,62 @@
-import axios from "axios";
+const API_URL =
+  "https://healthcare-crm-platform.onrender.com/api/customers/";
 
-const api = axios.create({
-  // Point explicitly to the Django backend API during local development
-  baseURL: "http://localhost:8000/api/",
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
-
-const unwrapApiResponse = (payload) => {
-  if (payload == null) return [];
-  if (Array.isArray(payload)) return payload;
-  if (Array.isArray(payload.data)) return payload.data;
-  if (Array.isArray(payload.results)) return payload.results;
-  if (Array.isArray(payload?.data?.results)) return payload.data.results;
-  if (payload.data !== undefined && payload.results === undefined) {
-    return payload.data;
-  }
-  return payload;
-};
-
-const getResponseData = (response) => {
-  return unwrapApiResponse(response?.data ?? response);
-};
-
-// ===================== Customers =====================
-
+// GET CUSTOMERS
 export const fetchCustomers = async () => {
-  const response = await api.get("customers/");
-  return getResponseData(response);
+  const response = await fetch(API_URL);
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch customers: ${response.status}`);
+  }
+
+  return await response.json();
 };
 
-export const createCustomer = async (payload) => {
-  const response = await api.post("customers/", payload);
-  return getResponseData(response);
+// CREATE CUSTOMER
+export const createCustomer = async (customerData) => {
+  const response = await fetch(API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(customerData),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error(errorText);
+    throw new Error(`Failed to create customer: ${response.status}`);
+  }
+
+  return await response.json();
 };
 
-export const updateCustomer = async (id, payload) => {
-  const response = await api.put(`customers/${id}/`, payload);
-  return getResponseData(response);
+// UPDATE CUSTOMER
+export const updateCustomer = async (id, customerData) => {
+  const response = await fetch(`${API_URL}${id}/`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(customerData),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to update customer: ${response.status}`);
+  }
+
+  return await response.json();
 };
 
+// DELETE CUSTOMER
 export const deleteCustomer = async (id) => {
-  return await api.delete(`customers/${id}/`);
-};
+  const response = await fetch(`${API_URL}${id}/`, {
+    method: "DELETE",
+  });
 
-export default api;
+  if (!response.ok) {
+    throw new Error(`Failed to delete customer: ${response.status}`);
+  }
+
+  return true;
+};
