@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import Layout from "../../components/Layout/Layout";
 import AddCustomerModal from "../../components/AddCustomerModal/AddCustomerModal";
 import "./Customers.css";
+
 import { saveAs } from "file-saver";
 import Papa from "papaparse";
 
@@ -31,13 +32,13 @@ function Customers() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    loadCustomers();
-  }, []);
-
   // =========================
   // LOAD CUSTOMERS
   // =========================
+
+  useEffect(() => {
+    loadCustomers();
+  }, []);
 
   const loadCustomers = async () => {
     setLoading(true);
@@ -46,7 +47,7 @@ function Customers() {
     try {
       const responseData = await fetchCustomers();
 
-      console.log("[Customers] fetchCustomers returned:", responseData);
+      console.log("Customers API response:", responseData);
 
       const normalized = Array.isArray(responseData)
         ? responseData
@@ -58,10 +59,7 @@ function Customers() {
         ? responseData.data.results
         : [];
 
-      console.log(
-        "[Customers] normalized customers count:",
-        normalized.length
-      );
+      console.log("Customers loaded:", normalized);
 
       setCustomers(normalized);
     } catch (err) {
@@ -112,7 +110,7 @@ function Customers() {
   );
 
   // =========================
-  // ADD CUSTOMER
+  // CREATE CUSTOMER
   // =========================
 
   const handleCreateCustomer = async (customerData) => {
@@ -133,7 +131,7 @@ function Customers() {
 
       const createdCustomer = await createCustomer(payload);
 
-      console.log("[Customers] createdCustomer:", createdCustomer);
+      console.log("Created customer:", createdCustomer);
 
       setCustomers((prev) => {
         const safePrev = Array.isArray(prev) ? prev : [];
@@ -146,6 +144,7 @@ function Customers() {
       setEditingCustomer(null);
     } catch (err) {
       console.error("Create customer error:", err);
+
       setError(
         "Unable to save customer. Please verify the form and try again."
       );
@@ -174,7 +173,7 @@ function Customers() {
 
       const updatedCustomer = await updateCustomer(id, payload);
 
-      console.log("[Customers] updatedCustomer:", updatedCustomer);
+      console.log("Updated customer:", updatedCustomer);
 
       setCustomers((prev) => {
         const safePrev = Array.isArray(prev) ? prev : [];
@@ -189,6 +188,7 @@ function Customers() {
       setEditingCustomer(null);
     } catch (err) {
       console.error("Update customer error:", err);
+
       setError("Unable to update customer. Please try again.");
     }
   };
@@ -222,16 +222,16 @@ function Customers() {
 
     const previousCustomers = [...safeCustomers];
 
-    // Remove immediately from UI
+    // Remove from UI immediately
     setCustomers((prev) => {
       const safePrev = Array.isArray(prev) ? prev : [];
+
       return safePrev.filter((customer) => customer.id !== id);
     });
 
     try {
       await deleteCustomerApi(id);
 
-      // Fix page if last item was deleted
       setCurrentPage((page) => {
         const remainingCustomers = previousCustomers.filter(
           (customer) => customer.id !== id
@@ -374,17 +374,18 @@ function Customers() {
 
         alert("Customers imported successfully.");
 
-        // Reset input so same file can be selected again
         event.target.value = "";
       },
 
       error: (parseError) => {
         console.error("Import CSV error:", parseError);
+
         setError("Unable to process CSV file.");
       },
     });
   };
-    // =========================
+
+  // =========================
   // RENDER
   // =========================
 
@@ -392,9 +393,10 @@ function Customers() {
     <Layout>
       <div className="customers-page">
 
-        {/* ================= HEADER ================= */}
+        {/* HEADER */}
 
         <div className="customers-header">
+
           <div>
             <h2>Customers</h2>
 
@@ -435,9 +437,10 @@ function Customers() {
             </label>
 
           </div>
+
         </div>
 
-        {/* ================= SEARCH ================= */}
+        {/* SEARCH */}
 
         <div className="customers-toolbar">
 
@@ -454,7 +457,7 @@ function Customers() {
 
         </div>
 
-        {/* ================= ERROR ================= */}
+        {/* ERROR */}
 
         {error && (
           <div className="error-banner">
@@ -462,7 +465,7 @@ function Customers() {
           </div>
         )}
 
-        {/* ================= LOADING ================= */}
+        {/* LOADING */}
 
         {loading ? (
 
@@ -474,7 +477,7 @@ function Customers() {
 
           <>
 
-            {/* ================= TABLE ================= */}
+            {/* TABLE */}
 
             <table className="customer-table">
 
@@ -533,6 +536,7 @@ function Customers() {
                       {/* STATUS */}
 
                       <td>
+
                         <span
                           className={`status-badge status-${(
                             customer.status || "Lead"
@@ -540,6 +544,7 @@ function Customers() {
                         >
                           {customer.status || "Lead"}
                         </span>
+
                       </td>
 
                       {/* ACTIONS */}
@@ -599,9 +604,10 @@ function Customers() {
 
             </table>
 
-            {/* ================= PAGINATION ================= */}
+            {/* PAGINATION */}
 
             {filteredCustomers.length > 0 && (
+
               <div className="pagination">
 
                 <button
@@ -619,6 +625,7 @@ function Customers() {
                 {Array.from(
                   { length: totalPages },
                   (_, index) => (
+
                     <button
                       type="button"
                       key={index}
@@ -633,6 +640,7 @@ function Customers() {
                     >
                       {index + 1}
                     </button>
+
                   )
                 )}
 
@@ -652,9 +660,10 @@ function Customers() {
                 </button>
 
               </div>
+
             )}
 
-            {/* ================= ADD / EDIT MODAL ================= */}
+            {/* ADD / EDIT MODAL */}
 
             <AddCustomerModal
               isOpen={isModalOpen}
@@ -674,7 +683,7 @@ function Customers() {
               statusOptions={statusOptions}
             />
 
-            {/* ================= VIEW MODAL ================= */}
+            {/* VIEW MODAL */}
 
             {isViewModalOpen && viewingCustomer && (
 
@@ -688,14 +697,18 @@ function Customers() {
                   onClick={(e) => e.stopPropagation()}
                 >
 
+                  {/* VIEW MODAL HEADER */}
+
                   <div className="view-modal-header">
 
                     <div>
+
                       <h3>Customer Details</h3>
 
                       <p>
                         View customer information
                       </p>
+
                     </div>
 
                     <button
@@ -708,10 +721,13 @@ function Customers() {
 
                   </div>
 
+                  {/* CUSTOMER DETAILS */}
+
                   <div className="customer-details">
 
                     <div className="detail-item">
                       <span>Name</span>
+
                       <strong>
                         {`${viewingCustomer.first_name || ""} ${
                           viewingCustomer.last_name || ""
@@ -721,6 +737,7 @@ function Customers() {
 
                     <div className="detail-item">
                       <span>Email</span>
+
                       <strong>
                         {viewingCustomer.email || "—"}
                       </strong>
@@ -728,6 +745,7 @@ function Customers() {
 
                     <div className="detail-item">
                       <span>Phone</span>
+
                       <strong>
                         {viewingCustomer.phone || "—"}
                       </strong>
@@ -735,6 +753,7 @@ function Customers() {
 
                     <div className="detail-item">
                       <span>Company</span>
+
                       <strong>
                         {viewingCustomer.company || "—"}
                       </strong>
@@ -742,6 +761,7 @@ function Customers() {
 
                     <div className="detail-item">
                       <span>City</span>
+
                       <strong>
                         {viewingCustomer.city || "—"}
                       </strong>
@@ -749,6 +769,7 @@ function Customers() {
 
                     <div className="detail-item">
                       <span>State</span>
+
                       <strong>
                         {viewingCustomer.state || "—"}
                       </strong>
@@ -756,6 +777,7 @@ function Customers() {
 
                     <div className="detail-item">
                       <span>Country</span>
+
                       <strong>
                         {viewingCustomer.country || "—"}
                       </strong>
@@ -765,6 +787,7 @@ function Customers() {
                       <span>Status</span>
 
                       <strong>
+
                         <span
                           className={`status-badge status-${(
                             viewingCustomer.status || "Lead"
@@ -772,10 +795,14 @@ function Customers() {
                         >
                           {viewingCustomer.status || "Lead"}
                         </span>
+
                       </strong>
+
                     </div>
 
                   </div>
+
+                  {/* VIEW MODAL FOOTER */}
 
                   <div className="view-modal-footer">
 

@@ -1,51 +1,89 @@
+import { useEffect, useState } from "react";
 import BarChartComponent from "../../components/Charts/BarChartComponent";
 import PieChartComponent from "../../components/Charts/PieChartComponent";
 import Layout from "../../components/Layout/Layout";
+import { fetchCustomers } from "../../services/customerService";
 import "./Dashboard.css";
 
 function Dashboard() {
+  const [customers, setCustomers] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch customers from backend
+  useEffect(() => {
+    const loadCustomers = async () => {
+      try {
+        const responseData = await fetchCustomers();
+
+        const data = Array.isArray(responseData)
+          ? responseData
+          : Array.isArray(responseData?.results)
+          ? responseData.results
+          : Array.isArray(responseData?.data)
+          ? responseData.data
+          : Array.isArray(responseData?.data?.results)
+          ? responseData.data.results
+          : [];
+
+        console.log("Dashboard customers:", data);
+
+        setCustomers(data);
+      } catch (error) {
+        console.error("Dashboard customer fetch error:", error);
+        setCustomers([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadCustomers();
+  }, []);
+
+  // Customer counts
+  const totalCustomers = customers.length;
+
+  const leadCount = customers.filter(
+    (customer) =>
+      String(customer.status || "").toLowerCase() === "lead"
+  ).length;
+
+  const customerCount = customers.filter(
+    (customer) =>
+      String(customer.status || "").toLowerCase() === "customer"
+  ).length;
+
+  const inactiveCount = customers.filter(
+    (customer) =>
+      String(customer.status || "").toLowerCase() === "inactive"
+  ).length;
+
   const stats = [
     {
       title: "Total Customers",
-      value: 120,
+      value: loading ? "..." : totalCustomers,
     },
     {
-      title: "Today's Visits",
-      value: 18,
+      title: "Leads",
+      value: loading ? "..." : leadCount,
     },
     {
-      title: "Interactions",
-      value: 350,
+      title: "Customers",
+      value: loading ? "..." : customerCount,
     },
     {
-      title: "Pending Follow-ups",
-      value: 22,
+      title: "Inactive",
+      value: loading ? "..." : inactiveCount,
     },
   ];
 
-  const activities = [
-    {
-      id: 1,
-      customer: "Dr. Rajesh Sharma",
-      interaction: "Product Demo",
-      date: "29 Jul 2026",
-      status: "Completed",
-    },
-    {
-      id: 2,
-      customer: "Dr. Priya Mehta",
-      interaction: "Phone Call",
-      date: "30 Jul 2026",
-      status: "Pending",
-    },
-    {
-      id: 3,
-      customer: "Dr. Amit Verma",
-      interaction: "Meeting",
-      date: "30 Jul 2026",
-      status: "Completed",
-    },
-  ];
+  // Show latest customers as recent activities
+  const recentCustomers = [...customers]
+    .sort((a, b) => {
+      const dateA = new Date(a.created_at || 0);
+      const dateB = new Date(b.created_at || 0);
+      return dateB - dateA;
+    })
+    .slice(0, 5);
 
   return (
     <Layout>
@@ -61,39 +99,51 @@ function Dashboard() {
         ))}
       </div>
 
-      {/* Recent Activities */}
-      <h2 className="recent-title">Recent Activities</h2>
+      {/* Recent Customers */}
+      <h2 className="recent-title">Recent Customers</h2>
 
       <table className="activity-table">
         <thead>
           <tr>
             <th>Customer</th>
-            <th>Interaction</th>
-            <th>Date</th>
+            <th>Company</th>
+            <th>City</th>
             <th>Status</th>
           </tr>
         </thead>
 
         <tbody>
-          {activities.map((activity) => (
-            <tr key={activity.id}>
-              <td>{activity.customer}</td>
-              <td>{activity.interaction}</td>
-              <td>{activity.date}</td>
-              <td>{activity.status}</td>
+          {recentCustomers.length > 0 ? (
+            recentCustomers.map((customer) => (
+              <tr key={customer.id}>
+                <td>
+                  {customer.first_name} {customer.last_name}
+                </td>
+                <td>{customer.company || "-"}</td>
+                <td>{customer.city || "-"}</td>
+                <td>{customer.status || "-"}</td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="4">
+                {loading ? "Loading customers..." : "No customers found"}
+              </td>
             </tr>
-          ))}
+          )}
         </tbody>
       </table>
-      <div className="charts-container">
-      <div className="chart-box">
-       <BarChartComponent />
-     </div>
 
-     <div className="chart-box">
-       <PieChartComponent />
-     </div>
-  </div>
+      {/* Charts */}
+      <div className="charts-container">
+        <div className="chart-box">
+          <BarChartComponent />
+        </div>
+
+        <div className="chart-box">
+          <PieChartComponent />
+        </div>
+      </div>
     </Layout>
   );
 }
